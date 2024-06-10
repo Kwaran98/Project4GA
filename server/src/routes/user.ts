@@ -74,9 +74,9 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
             if (err) { return res.sendStatus(403) }
             next();
         })
-    }
-
-    res.sendStatus(401)
+    }else{
+        res.sendStatus(401)
+    }    
 }
 
 export { router as userRouter }
