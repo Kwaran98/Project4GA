@@ -1,8 +1,10 @@
-import { SyntheticEvent, useState } from "react";
+import { SyntheticEvent, useState, useContext } from 'react';
 import axios from "axios";
 import { useCookies } from "react-cookie";
 import { UserErrors } from "../../models/error";
 import { useNavigate } from "react-router-dom";
+import "./styles.css";
+import { IShopContext, ShopContext } from '../../context/shopContext';
 
 export const Authentication = () => {
   return (
@@ -71,6 +73,8 @@ const Login = () => {
 
   const navigate = useNavigate();
 
+  const {setIsAuthenticated} = useContext<IShopContext>(ShopContext)
+
   //   SyntheticEvent is a type for an event that is in an onSubmit form
   const handleSubmit = async (event: SyntheticEvent) => {
     event.preventDefault();
@@ -81,6 +85,8 @@ const Login = () => {
       });
       setCookies("access_token", results.data.token);
       localStorage.setItem("userID", results.data.userID);
+      //By setting it to be true here whenever we login we will be authenticated
+      setIsAuthenticated(true)
       navigate("/");
     } catch (err) {
       let errorMessage: string = "";

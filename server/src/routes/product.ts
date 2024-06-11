@@ -67,10 +67,36 @@ router.post("/checkout", verifyToken, async (req: Request, res: Response) => {
       { $inc: { stockQuantity: -1 } }
     );
 
-    res.json({purchasedItems: user.purchasedItems})
+    res.json({ purchasedItems: user.purchasedItems });
   } catch (err) {
     res.status(400).json(err);
   }
 });
+
+//customer id is used as a param here to received the data to know which user actually gets the previously purchased items from
+router.get(
+  "/purchased-items/:customerID",
+  verifyToken,
+  async (req: Request, res: Response) => {
+    const { customerID } = req.params;
+
+    try {
+      const user = await UserModel.findById(customerID);
+      if (!user) {
+        res.status(400).json({ type: UserErrors.NO_USER_FOUND });
+      }
+
+      //even after this we need to fetch the available products
+      //here we are retrieving the IDs from the product model
+      const products = await ProductModel.find({_id : { $in: user.purchasedItems}})
+      //the purchased items is a list of IDs of the items that the particular user has previously purchased
+      //if we want to get the product based on the ids then we will have to do it like the codeline above
+
+      res.json({ purchasedItems: products });
+    } catch (err) {
+      res.status(500).json({ err });
+    }
+  }
+);
 
 export { router as productRouter };
