@@ -1,2 +1,2 @@
 # Project4GA
-This is a PERN stack e-commerce application.
+This is a MERN stack e-commerce application.
