@@ -83,8 +83,9 @@ const Login = () => {
         username,
         password,
       });
-      setCookies("access_token", results.data.token);
-      localStorage.setItem("userID", results.data.userID);
+      const { token, userID } = results.data;
+      setCookies("access_token", token);
+      localStorage.setItem("userID", userID);
       //By setting it to be true here whenever we login we will be authenticated
       setIsAuthenticated(true)
       navigate("/");
@@ -99,6 +100,7 @@ const Login = () => {
           break;
         default:
           errorMessage = "Something went wrong";
+          console.error('Login failed:', err);
       }
 
       alert("Error: " + errorMessage);

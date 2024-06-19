@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose";
 
 //Since we are using typescript, we have to create interfaces that can define the types of our objects
-export interface IUser {
+export interface IUser extends Document {
   _id?: string;
   username: string;
   password: string;

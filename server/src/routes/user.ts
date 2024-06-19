@@ -18,10 +18,17 @@ const router = Router();
 //req and res are used to get stuff from whoever made the request in the particular register route and send stuff to whoever who use the route
 
 router.post("/register", async (req: Request, res: Response) => {
-  const { username, password } = req.body; //we are accepting the username and password from the body here
+  console.log('Request body:', req.body); // Log the entire request body
 
-  //whenever we make a request to mongoose table, it will return a promise hence we have to use it an asynchronous function like await, try catch
-  //whenever we are accessing our databases, something might happen hence we will have to make an asynchronous function
+  const { username, password } = req.body;
+
+  console.log('Received username:', username);
+  console.log('Received password:', password);
+
+  // Check if username and password are provided
+  if (!username || !password) {
+    return res.status(400).json({ message: 'Username and password are required' });
+  }
 
   try {
     const user = await UserModel.findOne({ username });
@@ -30,14 +37,15 @@ router.post("/register", async (req: Request, res: Response) => {
       return res.status(400).json({ type: UserErrors.USERNAME_ALREADY_EXISTS });
     }
 
-    //this code is done here to provide security in the passwords
+    // Hash the password for security
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new UserModel({ username, password: hashedPassword });
     await newUser.save();
 
-    res.json({ message: "User Register Successfully" });
+    res.json({ message: "User Registered Successfully" });
   } catch (err) {
-    res.status(500).json({ type: err });
+    console.error("Error during registration:", err);
+    res.status(500).json({ type: err.message || "Internal Server Error" });
   }
 });
 
@@ -58,7 +66,7 @@ router.post("/login", async (req: Request, res: Response) => {
       return res.status(400).json({ type: UserErrors.WRONG_CREDENTIALS });
     }
 
-    const token = jwt.sign({ id: user._id }, "secret");
+    const token = jwt.sign({ id: user._id }, "secret", { expiresIn: '1h' });
     res.json({ token, userID: user._id });
   } catch (err) {
     res.status(500).json({ type: err });
@@ -72,11 +80,15 @@ export const verifyToken = (
   next: NextFunction
 ) => {
   const authHeader = req.headers.authorization;
-  if (authHeader) {
-    jwt.verify(authHeader, "secret", (err) => {
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.split(' ')[1];
+    console.log('Received Token:', token);
+    jwt.verify(token, 'secret', (err, decoded) => {
       if (err) {
-        return res.sendStatus(403);
+        console.error('Token verification failed:', err);
+        return res.sendStatus(403); // Forbidden
       }
+      (req as any).user = decoded as IUser; // Use type assertion here
       next();
     });
   } else {
@@ -95,6 +107,7 @@ router.get(
       if (!user) {
         res.status(400).json({ type: UserErrors.NO_USER_FOUND });
       }
+      const decodedUser = (req as any).user as IUser;
       res.json({ availableMoney: user.availableMoney });
     } catch (err) {
       res.status(500).json({ err });
