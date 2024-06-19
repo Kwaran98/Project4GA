@@ -21,6 +21,10 @@ app.use(express.json()); // Middleware to parse JSON bodies
 app.use("/user", userRouter);
 app.use("/product", productRouter);
 
+app.get('/', (req, res) => {
+  res.send('Hello, Vercel!');
+});
+
 // Connect to MongoDB
 mongoose.connect("mongodb+srv://egator:iJ5MV3mpl84XNJbR@cluster0.4vtjxuo.mongodb.net/ecommerce1?retryWrites=true&w=majority")
   .then(() => console.log("Connected to MongoDB"))
