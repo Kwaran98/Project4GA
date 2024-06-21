@@ -1,15 +1,18 @@
-import { useGetProducts } from "../../hooks/useGetProduct";
-import { Product } from "./product";
-import "./styles.css";
-import { useContext } from "react";
-import { IShopContext, ShopContext } from "../../context/shopContext";
+import { useEffect, useState } from "react";
+import { useCookies } from "react-cookie";
 import { Navigate } from "react-router-dom";
+import axios from "axios";
+import { Product } from "./product";
 
-export const Shop = () => {
+import "./styles.css";
+import { useGetProducts } from "../../hooks/useGetProducts";
+
+export const ShopPage = () => {
+  const [cookies, _] = useCookies(["access_token"]);
+
   const { products } = useGetProducts();
-  const { isAuthenticated } = useContext<IShopContext>(ShopContext);
 
-  if (!isAuthenticated) {
+  if (!cookies.access_token) {
     return <Navigate to="/auth" />;
   }
 

@@ -1,7 +1,6 @@
-import { useContext } from "react";
-import { IProduct } from "../../models/interface";
-import "./styles.css";
-import { IShopContext, ShopContext } from "../../context/shopContext";
+import React, { useContext } from "react";
+import { ShopContext } from "../../context/shop-context";
+import { IProduct } from "../../models/interfaces";
 
 interface Props {
   product: IProduct;
@@ -10,10 +9,9 @@ interface Props {
 export const Product = (props: Props) => {
   const { _id, productName, description, price, stockQuantity, imageURL } =
     props.product;
+  const { addToCart, getCartItemCount } = useContext(ShopContext);
 
-  const { addToCart, getCartItemCount } = useContext<IShopContext>(ShopContext);
-
-  const count = getCartItemCount(_id)
+  const cartItemCount = getCartItemCount(_id);
 
   return (
     <div className="product">
@@ -21,15 +19,14 @@ export const Product = (props: Props) => {
       <div className="description">
         <h3>{productName}</h3>
         <p>{description}</p>
-        <p>${price}</p>
+        <p> ${price}</p>
       </div>
-
       <button className="addToCartBttn" onClick={() => addToCart(_id)}>
-        Add to Cart {count > 0 && <>({count})</>}
+        Add To Cart {cartItemCount > 0 && <> ({cartItemCount})</>}
       </button>
 
-      <div className="stock-quantity">
-        {stockQuantity === 0 && <h1>OUT OF STOCK</h1>}
+      <div className="stockQuantity">
+        {stockQuantity === 0 && <h1> OUT OF STOCK</h1>}
       </div>
     </div>
   );

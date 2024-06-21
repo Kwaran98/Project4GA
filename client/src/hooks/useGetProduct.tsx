@@ -15,7 +15,6 @@ export const useGetProducts = () => {
       setProducts(response.data.products);
     } catch (err) {
       alert("ERROR: Something went wrong.");
-      console.error('Failed to fetch products:', err);
     }
   };
 

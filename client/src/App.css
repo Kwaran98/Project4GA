@@ -12,7 +12,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: rgb(19, 19, 19);
+  background-color: darkgreen;
   color: white;
   padding: 10px;
 }

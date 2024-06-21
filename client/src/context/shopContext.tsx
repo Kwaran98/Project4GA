@@ -55,48 +55,70 @@ export const ShopContextProvider = ({ children }: ShopContextProviderProps) => {
     try {
       const userId = localStorage.getItem("userID");
       if (!userId) throw new Error("User ID not found in local storage");
-      console.log('Headers with token:', headers);
-  
-      const res = await axios.get(`http://localhost:3001/user/available-money/${userId}`, { headers });
+      // console.log("Headers with token:", headers);
+
+      const res = await axios.get(
+        `http://localhost:3001/user/available-money/${userId}`,
+        { headers }
+      );
       setAvailableMoney(res.data.availableMoney);
     } catch (err) {
-      console.error('Failed to fetch available money:', err);
+      console.error("Failed to fetch available money:", err);
       alert("ERROR: Something went wrong.");
     }
   };
-  
 
   const fetchPurchasedItems = async () => {
     try {
       const userId = localStorage.getItem("userID");
       if (!userId) throw new Error("User ID not found in local storage");
 
-      const res = await axios.get(`http://localhost:3001/product/purchased-items/${userId}`, { headers });
+      const res = await axios.get(
+        `http://localhost:3001/product/purchased-items/${userId}`,
+        { headers }
+      );
       setPurchasedItems(res.data.purchasedItems);
     } catch (err) {
       alert("ERROR: Something went wrong.");
-      console.error('Failed to fetch purchased items:', err);
+      console.error("Failed to fetch purchased items:", err);
     }
   };
 
-  const getCartItemCount = (itemId: string): number => cartItems[itemId] || 0;
+  const getCartItemCount = (itemId: string): number => {
+    // console.log("Cart Items:", cartItems);
+    return cartItems[itemId] || 0;
+  };
 
   const addToCart = (itemId: string) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: (prev[itemId] || 0) + 1 }));
+    setCartItems((prev) => {
+      const updatedCart = { ...prev, [itemId]: (prev[itemId] || 0) + 1 };
+      // console.log("Updated Cart Items:", updatedCart);
+      return updatedCart;
+    });
   };
 
   const removeFromCart = (itemId: string) => {
     if (!cartItems[itemId]) return;
-    setCartItems((prev) => ({ ...prev, [itemId]: Math.max(prev[itemId] - 1, 0) }));
+    setCartItems((prev) => {
+      const updatedCart = { ...prev, [itemId]: Math.max(prev[itemId] - 1, 0) };
+      // console.log("Updated Cart Items:", updatedCart);
+      return updatedCart;
+    });
   };
 
   const updateCartItemCount = (newAmount: number, itemId: string) => {
     if (newAmount < 0) return;
-    setCartItems((prev) => ({ ...prev, [itemId]: newAmount }));
+    setCartItems((prev) => {
+      const updatedCart = { ...prev, [itemId]: newAmount };
+      // console.log("Updated Cart Items:", updatedCart);
+      return updatedCart;
+    });
   };
 
   const getTotalCartAmount = (): number => {
     let totalAmount = 0;
+    // console.log("Cart Items for Total:", cartItems);
+    // console.log("Products:", products);
     for (const item in cartItems) {
       if (cartItems[item] > 0) {
         const itemInfo = products.find((product) => product._id === item);
@@ -105,19 +127,22 @@ export const ShopContextProvider = ({ children }: ShopContextProviderProps) => {
         }
       }
     }
+    // console.log("Total Cart Amount:", totalAmount);
     return totalAmount;
   };
 
   const checkout = async () => {
     const body = { customerID: localStorage.getItem("userID"), cartItems };
     try {
-      await axios.post("http://localhost:3001/product/checkout", body, { headers });
+      await axios.post("http://localhost:3001/product/checkout", body, {
+        headers,
+      });
       setCartItems({});
       fetchAvailableMoney();
       fetchPurchasedItems();
       navigate("/");
     } catch (err) {
-      console.error('Checkout failed:', err);
+      console.error("Checkout failed:", err);
     }
   };
 
@@ -149,8 +174,6 @@ export const ShopContextProvider = ({ children }: ShopContextProviderProps) => {
   };
 
   return (
-    <ShopContext.Provider value={contextValue}>
-      {children}
-    </ShopContext.Provider>
+    <ShopContext.Provider value={contextValue}>{children}</ShopContext.Provider>
   );
 };

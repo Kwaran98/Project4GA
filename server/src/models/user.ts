@@ -1,7 +1,6 @@
 import { Schema, model } from "mongoose";
 
-//Since we are using typescript, we have to create interfaces that can define the types of our objects
-export interface IUser extends Document {
+export interface IUser {
   _id?: string;
   username: string;
   password: string;
@@ -10,7 +9,7 @@ export interface IUser extends Document {
 }
 
 const UserSchema = new Schema<IUser>({
-  username: { type: String, require: true, unique: true },
+  username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   availableMoney: { type: Number, default: 5000 },
   purchasedItems: [
